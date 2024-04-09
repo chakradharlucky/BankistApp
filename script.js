@@ -74,3 +74,27 @@ const currencies = new Map([
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
+// functions
+// Create username
+function createUsername(accounts) {
+  accounts.forEach(function (acct) {
+    Object.assign(acct, {
+      username: acct.owner
+        .toLowerCase()
+        .split(' ')
+        .map(name => name[0])
+        .join(''),
+    });
+    console.log(acct)
+  });
+}
+
+
+
+createUsername(accounts)
+
+btnLogin.addEventListener('click',function(e){
+  e.preventDefault()
+  const loginUsername = inputLoginUsername.value
+  const loginPin = inputLoginPin.value
+})
