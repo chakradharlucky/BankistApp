@@ -90,13 +90,16 @@ function createUsername(accounts) {
 
 // 2 check credentials and get current user
 function checkCreadentials(user, pin) {
-  const currentUser = accounts.find(
-    acct => acct.username === user && acct.pin === +pin
-  );
+  const currentUser = getUser(user)
   return {
-    login: currentUser ? true : false,
+    login: (currentUser && currentUser.pin === +pin) ? true : false,
     currentUser,
   };
+}
+
+// get user 
+function getUser(user) {
+  return accounts.find(acct => acct.username === user)
 }
 
 // 3 calculate balance
@@ -124,18 +127,18 @@ function updateUI(currentUser) {
     
     containerMovements.insertAdjacentHTML("afterbegin",createMovementHtml(movement,idx))
   })
-
+  
 }
 
 //create html movement
 function createMovementHtml(movement,idx) {
   const type = movement > 0 ? 'deposit' : 'withdrawal';
- return `<div class="movements__row">
-          <div class="movements__type movements__type--${type}">${
+  return `<div class="movements__row">
+  <div class="movements__type movements__type--${type}">${
     idx + 1
   } ${type}</div>
-          <div class="movements__value">${movement}€</div>
-        </div>`
+  <div class="movements__value">${movement}€</div>
+  </div>`
 }
 
 
@@ -148,15 +151,49 @@ btnLogin.addEventListener('click', function (e) {
   inputLoginUsername.value = ''
   inputLoginPin.value = ''
   inputLoginPin.blur()
+  inputLoginUsername.style.borderColor = inputLoginPin.style.borderColor = 'white'
   if (authenticationObject.login) {
-    const {currentUser} = authenticationObject
+    currentUser = authenticationObject['currentUser'];
     labelWelcome.textContent = `Welcome ${currentUser.owner.split(' ')[1]}`
     labelWelcome.textContent = `Welcome ${currentUser.owner}`
     containerApp.style.opacity = 100;
     updateUI(currentUser)  
   }
+  else{
+    inputLoginUsername.style.borderColor = inputLoginPin.style.borderColor = 'red'
+  }
 });
 
+// transfer money
+btnTransfer.addEventListener('click',(e)=>{
+  e.preventDefault();
+  const transferAmount = +inputTransferAmount.value
+  const transferToUser = getUser(inputTransferTo.value)
+  inputTransferAmount.value = ""
+  inputTransferTo.value = ""
+  inputTransferTo.blur()
+  if(transferToUser && transferToUser !== currentUser && currentUser.currentBalance >= transferAmount){
+    // console.log(transferToUser,transferAmount)
+    currentUser.movements.push(-transferAmount)
+    currentUser.currentBalance -= transferAmount
+    transferToUser.movements.push(transferAmount)
+    transferToUser.currentBalance += transferAmount
+    containerMovements.insertAdjacentHTML(
+      'afterbegin',
+      createMovementHtml(-transferAmount,currentUser.movements.length)
+    );
+    labelBalance.textContent = currentUser.currentBalance
+    
+  }
+  else{
+    console.log("Something went wrong")
+  }
+})
+
 // Function global calls
+inputLoginUsername.focus();
+let currentUser = account1
 createUsername(accounts);
 calculateBalance(accounts);
+containerApp.style.opacity = 100;
+updateUI(account1);
