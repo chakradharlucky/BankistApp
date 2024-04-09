@@ -6,7 +6,7 @@
 
 // Data
 const account1 = {
-  owner: 'Jonas Schmedtmann',
+  owner: 'Lakinana Chakradhar', //Jonas Schmedtmann
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
@@ -85,16 +85,32 @@ function createUsername(accounts) {
         .map(name => name[0])
         .join(''),
     });
-    console.log(acct)
   });
 }
 
+// check credentials and get current user
+function checkCreadentials(user, pin) {
+  const currentUser = accounts.find(
+    acct => acct.username === user && acct.pin === +pin
+  );
+  return {
+    login: currentUser ? true : false,
+    currentUser,
+  };
+}
 
+//Events handle
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault();
+  const loginUsername = inputLoginUsername.value;
+  const loginPin = inputLoginPin.value;
+  const authenticationObject = checkCreadentials(loginUsername, loginPin);
+  if (authenticationObject.login) {
+    const {currentUser} = authenticationObject
+    labelWelcome.textContent = `Welcome ${currentUser.owner.split(' ')[1]}`
+    containerApp.style.opacity = 100;
+  }
+});
 
-createUsername(accounts)
-
-btnLogin.addEventListener('click',function(e){
-  e.preventDefault()
-  const loginUsername = inputLoginUsername.value
-  const loginPin = inputLoginPin.value
-})
+// Function globle calls
+createUsername(accounts);
