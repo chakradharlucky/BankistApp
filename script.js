@@ -114,7 +114,11 @@ function calculateBalance(){
 
 // 4 Update UI
 function updateUI(currentUser) {
+  // display current balance
   labelBalance.textContent = currentUser.currentBalance
+  // display summary
+  labelSumIn.textContent = currentUser.movements.filter(movement => movement > 0).reduce((ac,movement)=>ac+=movement,0)
+  labelSumOut.textContent = Math.abs(currentUser.movements.filter(movement => movement < 0).reduce((ac,movement)=>ac+=movement,0))
 }
 
 //Events handle
@@ -130,10 +134,12 @@ btnLogin.addEventListener('click', function (e) {
     const {currentUser} = authenticationObject
     labelWelcome.textContent = `Welcome ${currentUser.owner.split(' ')[1]}`
     containerApp.style.opacity = 100;
-    updateUI(currentUser) 
+    updateUI(currentUser)  
   }
 });
 
 // Function globle calls
 createUsername(accounts);
 calculateBalance(accounts);
+containerApp.style.opacity = 100;
+updateUI(account1)
