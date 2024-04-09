@@ -119,7 +119,25 @@ function updateUI(currentUser) {
   // display summary
   labelSumIn.textContent = currentUser.movements.filter(movement => movement > 0).reduce((ac,movement)=>ac+=movement,0)
   labelSumOut.textContent = Math.abs(currentUser.movements.filter(movement => movement < 0).reduce((ac,movement)=>ac+=movement,0))
+  // display movements
+  currentUser.movements.forEach((movement,idx)=>{
+    
+    containerMovements.insertAdjacentHTML("afterbegin",createMovementHtml(movement,idx))
+  })
+
 }
+
+//create html movement
+function createMovementHtml(movement,idx) {
+  const type = movement > 0 ? 'deposit' : 'withdrawal';
+ return `<div class="movements__row">
+          <div class="movements__type movements__type--${type}">${
+    idx + 1
+  } ${type}</div>
+          <div class="movements__value">${movement}€</div>
+        </div>`
+}
+
 
 //Events handle
 btnLogin.addEventListener('click', function (e) {
@@ -133,13 +151,12 @@ btnLogin.addEventListener('click', function (e) {
   if (authenticationObject.login) {
     const {currentUser} = authenticationObject
     labelWelcome.textContent = `Welcome ${currentUser.owner.split(' ')[1]}`
+    labelWelcome.textContent = `Welcome ${currentUser.owner}`
     containerApp.style.opacity = 100;
     updateUI(currentUser)  
   }
 });
 
-// Function globle calls
+// Function global calls
 createUsername(accounts);
 calculateBalance(accounts);
-containerApp.style.opacity = 100;
-updateUI(account1)
