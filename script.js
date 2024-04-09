@@ -75,7 +75,7 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
 // functions
-// Create username
+// 1 Create username
 function createUsername(accounts) {
   accounts.forEach(function (acct) {
     Object.assign(acct, {
@@ -88,7 +88,7 @@ function createUsername(accounts) {
   });
 }
 
-// check credentials and get current user
+// 2 check credentials and get current user
 function checkCreadentials(user, pin) {
   const currentUser = accounts.find(
     acct => acct.username === user && acct.pin === +pin
@@ -99,18 +99,41 @@ function checkCreadentials(user, pin) {
   };
 }
 
+// 3 calculate balance
+function calculateBalance(){
+  accounts.forEach(
+    (acct)=>{
+    Object.assign(acct, {
+      currentBalance: acct.movements.reduce(
+        (ac, movement) => (ac += movement),
+        0
+      ),
+    });
+  })
+}
+
+// 4 Update UI
+function updateUI(currentUser) {
+  labelBalance.textContent = currentUser.currentBalance
+}
+
 //Events handle
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
   const loginUsername = inputLoginUsername.value;
   const loginPin = inputLoginPin.value;
   const authenticationObject = checkCreadentials(loginUsername, loginPin);
+  inputLoginUsername.value = ''
+  inputLoginPin.value = ''
+  inputLoginPin.blur()
   if (authenticationObject.login) {
     const {currentUser} = authenticationObject
     labelWelcome.textContent = `Welcome ${currentUser.owner.split(' ')[1]}`
     containerApp.style.opacity = 100;
+    updateUI(currentUser) 
   }
 });
 
 // Function globle calls
 createUsername(accounts);
+calculateBalance(accounts);
