@@ -83,7 +83,7 @@ function createUsername(accounts) {
         .toLowerCase()
         .split(' ')
         .map(name => name[0])
-        .join(''),
+        .join('')
     });
   });
 }
@@ -174,14 +174,14 @@ btnTransfer.addEventListener('click',(e)=>{
   inputTransferTo.blur()
   if(transferToUser && transferToUser !== currentUser && currentUser.currentBalance >= transferAmount){
     // console.log(transferToUser,transferAmount)
-    currentUser.movements.push(-transferAmount)
     currentUser.currentBalance -= transferAmount
     transferToUser.movements.push(transferAmount)
     transferToUser.currentBalance += transferAmount
     containerMovements.insertAdjacentHTML(
       'afterbegin',
       createMovementHtml(-transferAmount,currentUser.movements.length)
-    );
+      );
+      currentUser.movements.push(-transferAmount)
     labelBalance.textContent = currentUser.currentBalance
     
   }
@@ -190,10 +190,27 @@ btnTransfer.addEventListener('click',(e)=>{
   }
 })
 
+function verificationForLoan(movements,requestAmount){
+  return movements.some((movement)=>movement > requestAmount/10)
+}
+
+//request loan
+btnLoan.addEventListener('click',(e)=>{
+  e.preventDefault()
+  const requestAmount = +inputLoanAmount.value
+  if(requestAmount > 0 && verificationForLoan(currentUser.movements,requestAmount)){
+    currentUser.currentBalance+=requestAmount
+    containerMovements.insertAdjacentHTML(
+      'afterbegin',
+      createMovementHtml(requestAmount,currentUser.movements.length)
+      );
+      currentUser.movements.push(requestAmount)
+    labelBalance.textContent = currentUser.currentBalance
+  }
+})
+
 // Function global calls
 inputLoginUsername.focus();
 let currentUser = account1
 createUsername(accounts);
 calculateBalance(accounts);
-containerApp.style.opacity = 100;
-updateUI(account1);
