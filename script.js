@@ -209,6 +209,19 @@ btnLoan.addEventListener('click',(e)=>{
   }
 })
 
+//close account
+btnClose.addEventListener('click',(e)=>{
+  e.preventDefault()
+  if(currentUser.username === inputCloseUsername.value && currentUser.pin === +inputClosePin.value){
+    inputClosePin.value = ''
+    inputCloseUsername.value = ''
+    inputClosePin.blur()
+    accounts.splice(accounts.indexOf(currentUser),1)
+    currentUser = null
+    containerApp.style.opacity = 0;      
+  }
+})
+
 // Function global calls
 inputLoginUsername.focus();
 let currentUser = account1
