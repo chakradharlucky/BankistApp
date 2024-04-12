@@ -84,6 +84,7 @@ function createUsername(accounts) {
         .split(' ')
         .map(name => name[0])
         .join(''),
+        loan: 0
     });
   });
 }
@@ -154,7 +155,7 @@ btnLogin.addEventListener('click', function (e) {
   inputLoginUsername.style.borderColor = inputLoginPin.style.borderColor = 'white'
   if (authenticationObject.login) {
     currentUser = authenticationObject['currentUser'];
-    labelWelcome.textContent = `Welcome ${currentUser.owner.split(' ')[1]}`
+    // labelWelcome.textContent = `Welcome ${currentUser.owner.split(' ')[1]}`
     labelWelcome.textContent = `Welcome ${currentUser.owner}`
     containerApp.style.opacity = 100;
     updateUI(currentUser)  
@@ -190,10 +191,21 @@ btnTransfer.addEventListener('click',(e)=>{
   }
 })
 
+//close account
+btnClose.addEventListener('click',(e)=>{
+  e.preventDefault()
+  if(currentUser.username === inputCloseUsername.value && +inputClosePin.value === currentUser.pin && currentUser
+    .loan === 0)
+  {
+    // containerApp.style.opacity = 0;
+    // labelWelcome.textContent = `Log in to get started`;
+    accounts.(accounts.indexOf(currentUser))
+    console.log(accounts)
+  }
+})
+
 // Function global calls
 inputLoginUsername.focus();
 let currentUser = account1
 createUsername(accounts);
 calculateBalance(accounts);
-containerApp.style.opacity = 100;
-updateUI(account1);
