@@ -18,8 +18,8 @@ const account1 = {
     '2020-05-08T14:11:59.604Z',
     '2020-05-27T17:01:17.194Z',
     '2020-07-11T23:36:17.929Z',
-    '2020-07-12T10:51:36.790Z'
-  ]
+    '2020-07-12T10:51:36.790Z',
+  ],
 };
 
 const account2 = {
@@ -35,8 +35,8 @@ const account2 = {
     '2020-02-05T16:33:06.386Z',
     '2020-04-10T14:43:26.374Z',
     '2020-06-25T18:49:59.371Z',
-    '2020-07-26T12:01:20.894Z'
-  ]
+    '2020-07-26T12:01:20.894Z',
+  ],
 };
 
 const account3 = {
@@ -52,8 +52,8 @@ const account3 = {
     '2020-02-05T16:33:06.386Z',
     '2020-04-10T14:43:26.374Z',
     '2020-06-25T18:49:59.371Z',
-    '2020-07-26T12:01:20.894Z'
-  ]
+    '2020-07-26T12:01:20.894Z',
+  ],
 };
 
 const account4 = {
@@ -66,8 +66,8 @@ const account4 = {
     '2019-12-23T07:42:02.383Z',
     '2020-01-28T09:15:04.904Z',
     '2020-04-01T10:17:24.185Z',
-    '2020-05-08T14:11:59.604Z'
-  ]
+    '2020-05-08T14:11:59.604Z',
+  ],
 };
 
 const accounts = [account1, account2, account3, account4];
@@ -127,64 +127,68 @@ function createUsername(accounts) {
 
 // 2 check credentials and get current user
 function checkCreadentials(user, pin) {
-  const currentUser = getUser(user)
+  const currentUser = getUser(user);
   return {
-    login: (currentUser && currentUser.pin === +pin) ? true : false,
+    login: currentUser && currentUser.pin === +pin ? true : false,
     currentUser,
   };
 }
 
-// get user 
+// get user
 function getUser(user) {
-  return accounts.find(acct => acct.username === user)
+  return accounts.find(acct => acct.username === user);
 }
 
 // 3 calculate balance
-function calculateBalance(){
-  accounts.forEach(
-    (acct)=>{
+function calculateBalance() {
+  accounts.forEach(acct => {
     Object.assign(acct, {
       currentBalance: acct.movements.reduce(
         (ac, movement) => (ac += movement),
         0
       ),
     });
-  })
+  });
 }
 
 // 4 Update UI
 function updateUI(currentUser) {
   // display current balance
-  labelBalance.textContent = currentUser.currentBalance
+  labelBalance.textContent = currentUser.currentBalance;
   // display summary
-  labelSumIn.textContent = currentUser.movements.filter(movement => movement > 0).reduce((ac,movement)=>ac+=movement,0)
-  labelSumOut.textContent = Math.abs(currentUser.movements.filter(movement => movement < 0).reduce((ac,movement)=>ac+=movement,0))
+  labelSumIn.textContent = currentUser.movements
+    .filter(movement => movement > 0)
+    .reduce((ac, movement) => (ac += movement), 0);
+  labelSumOut.textContent = Math.abs(
+    currentUser.movements
+      .filter(movement => movement < 0)
+      .reduce((ac, movement) => (ac += movement), 0)
+  );
   // display movements
-  currentUser.movements.forEach((movement,idx)=>{
-    
-    containerMovements.insertAdjacentHTML("afterbegin",createMovementHtml(movement,idx,currentUser.movementsDates[idx]))
-  })
-  
+  currentUser.movements.forEach((movement, idx) => {
+    containerMovements.insertAdjacentHTML(
+      'afterbegin',
+      createMovementHtml(movement, idx, currentUser.movementsDates[idx])
+    );
+  });
 }
 
 //create html movement
-function createMovementHtml(movement,idx,date) {
+function createMovementHtml(movement, idx, date) {
   const type = movement > 0 ? 'deposit' : 'withdrawal';
   return `<div class="movements__row">
-  <div class="movements__type movements__type--${type}">${
-    idx + 1
-  } ${type}</div>
+  <div class="movements__type movements__type--${type}">${idx + 1} ${type}</div>
   <div class="movements__date">${dateFormmate(new Date(date))}</div>
   <div class="movements__value">${movement}€</div>
-  </div>`
+  </div>`;
 }
 
 //date
 function dateFormmate(date) {
-const dateDay = date.getDate()+""
-const month = date.getMonth()+1+""
-const year = date.getFullYear()+""
-return `${dateDay.padStart(2,0)}/${month.padStart(2,0)}/${year}`
+  const dateDay = date.getDate() + '';
+  const month = date.getMonth() + 1 + '';
+  const year = date.getFullYear() + '';
+  return `${dateDay.padStart(2, 0)}/${month.padStart(2, 0)}/${year}`;
 }
 
 //Events handle
@@ -193,51 +197,96 @@ btnLogin.addEventListener('click', function (e) {
   const loginUsername = inputLoginUsername.value;
   const loginPin = inputLoginPin.value;
   const authenticationObject = checkCreadentials(loginUsername, loginPin);
-  inputLoginUsername.value = ''
-  inputLoginPin.value = ''
-  inputLoginPin.blur()
-  inputLoginUsername.style.borderColor = inputLoginPin.style.borderColor = 'white'
+  inputLoginUsername.value = '';
+  inputLoginPin.value = '';
+  inputLoginPin.blur();
+  inputLoginUsername.style.borderColor = inputLoginPin.style.borderColor =
+    'white';
   if (authenticationObject.login) {
     currentUser = authenticationObject['currentUser'];
-    // labelWelcome.textContent = `Welcome ${currentUser.owner.split(' ')[1]}`
-    labelWelcome.textContent = `Welcome ${currentUser.owner}`
+    labelWelcome.textContent = `Welcome ${currentUser.owner}`;
     containerApp.style.opacity = 100;
-    updateUI(currentUser)  
-  }
-  else{
-    inputLoginUsername.style.borderColor = inputLoginPin.style.borderColor = 'red'
+    updateUI(currentUser);
+  } else {
+    inputLoginUsername.style.borderColor = inputLoginPin.style.borderColor =
+      'red';
   }
 });
 
 // transfer money
-btnTransfer.addEventListener('click',(e)=>{
+btnTransfer.addEventListener('click', e => {
   e.preventDefault();
-  const transferAmount = +inputTransferAmount.value
-  const transferToUser = getUser(inputTransferTo.value)
-  inputTransferAmount.value = ""
-  inputTransferTo.value = ""
-  inputTransferTo.blur()
-  if(transferToUser && transferToUser !== currentUser && currentUser.currentBalance >= transferAmount){
-    currentUser.currentBalance -= transferAmount
-    transferToUser.movements.push(transferAmount)
-    transferToUser.currentBalance += transferAmount
+  const transferAmount = +inputTransferAmount.value;
+  const transferToUser = getUser(inputTransferTo.value);
+  inputTransferAmount.value = '';
+  inputTransferTo.value = '';
+  inputTransferTo.blur();
+  if (
+    transferToUser &&
+    transferToUser !== currentUser &&
+    currentUser.currentBalance >= transferAmount
+  ) {
+    currentUser.currentBalance -= transferAmount;
+    transferToUser.movements.push(transferAmount);
+    transferToUser.currentBalance += transferAmount;
     containerMovements.insertAdjacentHTML(
       'afterbegin',
-      createMovementHtml(-transferAmount,currentUser.movements.length)
-      );
-      currentUser.movements.push(-transferAmount)
-    labelBalance.textContent = currentUser.currentBalance
-    
+      createMovementHtml(
+        -transferAmount,
+        currentUser.movements.length,
+        new Date().toISOString()
+      )
+    );
+    currentUser.movements.push(-transferAmount);
+    currentUser.movementsDates.push(new Date().toISOString());
+    labelBalance.textContent = currentUser.currentBalance;
+  } else {
+    console.log('Something went wrong');
   }
-  else{
-    console.log("Something went wrong")
+});
+
+function verificationForLoan(movements, requestAmount) {
+  return movements.some(movement => movement > requestAmount / 10);
+}
+
+//request loan
+btnLoan.addEventListener('click', e => {
+  e.preventDefault();
+  const requestAmount = +inputLoanAmount.value;
+  if (
+    requestAmount > 0 &&
+    verificationForLoan(currentUser.movements, requestAmount)
+  ) {
+    currentUser.currentBalance += requestAmount;
+    containerMovements.insertAdjacentHTML(
+      'afterbegin',
+      createMovementHtml(requestAmount, currentUser.movements.length)
+    );
+    currentUser.movements.push(requestAmount);
+    labelBalance.textContent = currentUser.currentBalance;
   }
-})
+});
+
+//close account
+btnClose.addEventListener('click', e => {
+  e.preventDefault();
+  if (
+    currentUser.username === inputCloseUsername.value &&
+    currentUser.pin === +inputClosePin.value
+  ) {
+    inputClosePin.value = '';
+    inputCloseUsername.value = '';
+    inputClosePin.blur();
+    accounts.splice(accounts.indexOf(currentUser), 1);
+    currentUser = null;
+    containerApp.style.opacity = 0;
+  }
+});
 
 // Function global calls
+labelDate.textContent = dateFormmate(new Date());
+labelDate.textContent = new Date().toDateString();
 inputLoginUsername.focus();
-let currentUser = account1
+let currentUser;
 createUsername(accounts);
 calculateBalance(accounts);
-containerApp.style.opacity = 100;
-updateUI(account1);
