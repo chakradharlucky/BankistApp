@@ -178,17 +178,23 @@ function createMovementHtml(movement, idx, date) {
   const type = movement > 0 ? 'deposit' : 'withdrawal';
   return `<div class="movements__row">
   <div class="movements__type movements__type--${type}">${idx + 1} ${type}</div>
-  <div class="movements__date">${dateFormmate(new Date(date))}</div>
+  <div class="movements__date">${dateFormate(new Date(date))}</div>
   <div class="movements__value">${movement}€</div>
   </div>`;
 }
 
 //date
-function dateFormmate(date) {
-  const dateDay = date.getDate() + '';
-  const month = date.getMonth() + 1 + '';
-  const year = date.getFullYear() + '';
-  return `${dateDay.padStart(2, 0)}/${month.padStart(2, 0)}/${year}`;
+function dateFormate(date) {
+  // const dateDay = date.getDate() + '';
+  // const month = date.getMonth() + 1 + '';
+  // const year = date.getFullYear() + '';
+  // return `${dateDay.padStart(2, 0)}/${month.padStart(2, 0)}/${year}`;
+  return Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    year: 'numeric',
+    month: '2-digit',
+  }).format(date);
+  
 }
 
 //Events handle
@@ -207,6 +213,7 @@ btnLogin.addEventListener('click', function (e) {
     labelWelcome.textContent = `Welcome ${currentUser.owner}`;
     containerApp.style.opacity = 100;
     updateUI(currentUser);
+    labelDate.textContent = new Date().toDateString();
   } else {
     inputLoginUsername.style.borderColor = inputLoginPin.style.borderColor =
       'red';
@@ -218,6 +225,7 @@ btnTransfer.addEventListener('click', e => {
   e.preventDefault();
   const transferAmount = +inputTransferAmount.value;
   const transferToUser = getUser(inputTransferTo.value);
+  const date = new Date().toISOString();
   inputTransferAmount.value = '';
   inputTransferTo.value = '';
   inputTransferTo.blur();
@@ -229,16 +237,17 @@ btnTransfer.addEventListener('click', e => {
     currentUser.currentBalance -= transferAmount;
     transferToUser.movements.push(transferAmount);
     transferToUser.currentBalance += transferAmount;
+    transferToUser.movementsDates.push(date);
     containerMovements.insertAdjacentHTML(
       'afterbegin',
       createMovementHtml(
         -transferAmount,
         currentUser.movements.length,
-        new Date().toISOString()
+        date
       )
     );
     currentUser.movements.push(-transferAmount);
-    currentUser.movementsDates.push(new Date().toISOString());
+    currentUser.movementsDates.push(date);
     labelBalance.textContent = currentUser.currentBalance;
   } else {
     console.log('Something went wrong');
@@ -260,8 +269,9 @@ btnLoan.addEventListener('click', e => {
     currentUser.currentBalance += requestAmount;
     containerMovements.insertAdjacentHTML(
       'afterbegin',
-      createMovementHtml(requestAmount, currentUser.movements.length)
+      createMovementHtml(requestAmount, currentUser.movements.length,new Date().toISOString())
     );
+    currentUser.movementsDates.push(new Date().toISOString());
     currentUser.movements.push(requestAmount);
     labelBalance.textContent = currentUser.currentBalance;
   }
@@ -279,14 +289,12 @@ btnClose.addEventListener('click', e => {
     inputClosePin.blur();
     accounts.splice(accounts.indexOf(currentUser), 1);
     currentUser = null;
-    containerApp.style.opacity = 0;
+    labelWelcome.textContent = 'Log in to get started';
   }
 });
 
 // Function global calls
-labelDate.textContent = dateFormmate(new Date());
-labelDate.textContent = new Date().toDateString();
 inputLoginUsername.focus();
-let currentUser;
+let currentUser
 createUsername(accounts);
 calculateBalance(accounts);
